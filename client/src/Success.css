@@ -1,0 +1,23 @@
+.style-success {
+    position: absolute;
+    border-radius: 100px;
+    width: 80%;
+    height: 80%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgb(174, 240, 174);
+    color: white;
+    font-size: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.show {
+    display: block;
+}
+
+.hide {
+    display: none;
+}
