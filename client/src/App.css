@@ -40,3 +40,30 @@
 .read-the-docs {
   color: #888;
 }
+
+.form-style {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-style input[type="text"] {
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  margin-top: 15px;
+  font-size: 25px;
+}
+
+#btnEntra {
+  padding: 10px 20px;
+  background-color: blue;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+#btnEntra:hover {
+  background-color: darkblue;
+}
