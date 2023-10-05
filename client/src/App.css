@@ -67,3 +67,17 @@
 #btnEntra:hover {
   background-color: darkblue;
 }
+
+#btnEntra .disable {
+  background-color: rgb(66, 66, 66);
+}
+
+.danger {
+  color: red;
+  font-style: italic;
+  font-size: 12px;
+}
+
+.hidden {
+  display: none;
+}
