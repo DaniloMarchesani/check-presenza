@@ -12,12 +12,13 @@ function App() {
     //qui verra fatto il fetch al backend
     console.log("ciao")
     setShowSuccess(true);
-    setTimeout( () => setShowSuccess(false), 2000)
+    setTimeout( () => setShowSuccess(false), 3000)
   
   }
 
   return (
     <div>
+      <h1>Check Presenza</h1>
       <form onSubmit={sendValue}>
         <div className='form-style'>
           <label htmlFor="codice">Inserisci Codice Studente</label>
