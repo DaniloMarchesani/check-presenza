@@ -7,7 +7,9 @@ import './App.css'
 function App() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [isEmpty, setIsEmpty] = useState('');
-  const [code, setCode]=useState()
+  const [code, setCode]=useState();
+  const [status, setStatus] = useState({})
+
   const sendValue = (e) => {
     e.preventDefault();
     
@@ -16,9 +18,17 @@ function App() {
       method:"POST",
       headers:{"Content-type":"application/json",},
       body:JSON.stringify({codice:code})
-
     })
-    console.log("ciao")
+    .then(resp => resp.json())
+    .then(data => {
+      console.log(data);
+      setStatus(data);
+      console.log(status);
+    })
+    .catch(err => console.log(err))
+    
+
+
     setShowSuccess(true);
     setTimeout( () => setShowSuccess(false), 3000)
   
@@ -51,7 +61,7 @@ function App() {
       <p className='danger' hidden={isEmpty}>Il tuo codice deve essere di almeno 5 caratteri...</p>
 
     {
-      showSuccess ? <Success /> : null
+      showSuccess ? <Success status={status}/> : null
     }
     
 
