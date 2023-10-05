@@ -7,14 +7,25 @@ import './App.css'
 function App() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [isEmpty, setIsEmpty] = useState('');
-  
+  const [code, setCode]=useState()
   const sendValue = (e) => {
     e.preventDefault();
+    
     //qui verra fatto il fetch al backend
+    fetch("http://127.0.0.1:5000/controlloPresenze", {
+      method:"POST",
+      headers:{"Content-type":"application/json",},
+      body:JSON.stringify({codice:code})
+
+    })
     console.log("ciao")
     setShowSuccess(true);
     setTimeout( () => setShowSuccess(false), 3000)
   
+  }
+  const handleCodeInput=(e)=>{
+    checkIfEmpty(e)
+    setCode(e.target.value)
   }
 
   const checkIfEmpty = (e) => {
@@ -33,7 +44,7 @@ function App() {
       <form onSubmit={sendValue}>
         <div className='form-style'>
           <label htmlFor="codice">Inserisci Codice Studente</label>
-          <input type="text" placeholder='Il tuo codice...' id='inputCodice' name='codice' onChange={checkIfEmpty}/>
+          <input type="text" placeholder='Il tuo codice...' id='inputCodice' name='codice' onChange={handleCodeInput}/>
         </div>
         <button type="submit" id="btnEntra" disabled={!isEmpty}>Invia</button>
       </form>

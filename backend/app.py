@@ -1,9 +1,13 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
+
 from datetime import datetime
+
 import pw
 
 app = Flask(__name__)
+CORS(app)
 
 if __name__ == "__main__":
     app.run(debug=True)
@@ -39,6 +43,7 @@ class Presenze(db.Model):
 def controlloPresenze():
     time = datetime.now()
     giorno = time.date()
+    print(request.json)
     codice = request.json["codice"]
     # Prendo gli utenti con quel codice dal database
     fetchutenti = Utenti.query.filter_by(codice=codice).all()
