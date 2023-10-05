@@ -12,8 +12,8 @@ create table utenti(
 create table presenze(
 	id integer auto_increment,
     giorno varchar(10),
-    entrata timestamp,
-    uscita timestamp,
+    entrata datetime,
+    uscita datetime,
     codice varchar(10),
     valido bool default true,
     PRIMARY KEY (id),
