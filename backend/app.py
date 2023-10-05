@@ -37,20 +37,23 @@ class Presenze(db.Model):
 
 @app.route("/controlloPresenze", methods=["GET", "POST"])
 def controlloPresenze():
-    now = datetime.now()
-    timestamp = datetime.timestamp(now)
-    giorno = now.date()
+    time = datetime.now()
+    giorno = time.date()
     codice = request.json["codice"]
     # Prendo gli utenti con quel codice dal database
     fetchutenti = Utenti.query.filter_by(codice=codice).all()
     # fetchutenti=db.session.execute(db.select(Utenti).filter_by(codice=codice).all())
     # Controllo se è stato trovato un record
-    print(fetchutenti)
+
     if not fetchutenti:
         response = jsonify({"msg": "Codice non trovato", "code": 404})
     else:
-        sqlpresenze = Presenze.query.filter_by(codice=codice).filter_by(giorno=giorno)
-        presenze_list = [
+        sqlpresenze = (
+            Presenze.query.filter_by(codice=codice)
+            .filter_by(giorno=giorno)
+            .filter_by(valido=1)
+        )
+        presenza_list = [
             {
                 "id": presenza.id,
                 "giorno": presenza.giorno,
@@ -61,15 +64,22 @@ def controlloPresenze():
             }
             for presenza in sqlpresenze
         ]
-        print(presenze_list)
+
         # se non esiste il record della presenza lo crea con l'entrata
-        if not presenze_list:
-            insert = Presenze(codice=codice, giorno=giorno)  # , entrata=timestamp)
+
+        if not presenza_list:
+            insert = Presenze(codice=codice, giorno=giorno, entrata=time, valido=1)
+            # print("insert:\n" + insert)
             db.session.add(insert)
             db.session.commit()
             response = jsonify({"msg": "Entrata registrata", "code": 201})
         else:  # altrimenti aggiorno l'uscita
-            sqlpresenze.uscita = timestamp
+            update = (
+                Presenze.query.filter_by(codice=codice)
+                .filter_by(giorno=giorno)
+                .filter_by(valido=1)
+                .update(dict(uscita=time, valido=0))
+            )
             db.session.commit()
             response = jsonify({"msg": "Uscita registrata", "code": 202})
 
