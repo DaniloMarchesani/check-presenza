@@ -1,3 +1,4 @@
+# IMPORTS #
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -5,6 +6,8 @@ from flask_cors import CORS
 from datetime import datetime
 
 import pw
+# ---#
+
 
 app = Flask(__name__)
 CORS(app)
@@ -23,6 +26,12 @@ db = SQLAlchemy(app)
 
 
 class Utenti(db.Model):
+    """
+    Class 'Utenti'
+
+    -   This Class represents the 'Utenti' model table
+        in the 'checkPresenze' database
+    """
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(30))
     cognome = db.Column(db.String(30))
@@ -31,6 +40,12 @@ class Utenti(db.Model):
 
 
 class Presenze(db.Model):
+    """
+    Class 'Presenze'
+
+    -   This Class represents the 'Presenze' model table
+        in the 'checkPresenze' database   
+    """
     id = db.Column(db.Integer, primary_key=True)
     giorno = db.Column(db.String(10))
     entrata = db.Column(db.TIMESTAMP)
@@ -41,44 +56,52 @@ class Presenze(db.Model):
 
 @app.route("/controlloPresenze", methods=["GET", "POST"])
 def controlloPresenze():
+    codice = request.json["codice"]
     time = datetime.now()
     giorno = time.date()
-    print(request.json)
-    codice = request.json["codice"]
-    # Prendo gli utenti con quel codice dal database
-    fetchutenti = Utenti.query.filter_by(codice=codice).all()
-    # fetchutenti=db.session.execute(db.select(Utenti).filter_by(codice=codice).all())
-    # Controllo se è stato trovato un record
 
+    #Dato il codice eseguo un select alla tabella utenti filtrato per id per ricevere i dati
+    #dell'utente
+    fetchutenti = Utenti.query.filter_by(codice=codice).all()
+
+    #Controllo se è stato trovato un utente
     if not fetchutenti:
+        #Se il codice immesso non appartiene a nessun utente in database
+        #Ritorna il messaggio "Codice non trovato" con codice 404
         response = jsonify({"msg": "Codice non trovato", "code": 404})
     else:
+        # In caso di utente trovato, vado a prelevare dal database le sue presenze 'aperte'
+        # ovvero quelle da cui non è ancora stata registrata l'uscita
+        presenza_list = []
         sqlpresenze = (
             Presenze.query.filter_by(codice=codice)
             .filter_by(giorno=giorno)
             .filter_by(valido=1)
         )
-        presenza_list = [
-            {
-                "id": presenza.id,
-                "giorno": presenza.giorno,
-                "entrata": presenza.entrata,
-                "uscita": presenza.uscita,
-                "codice": presenza.codice,
-                "valido": presenza.valido,
-            }
-            for presenza in sqlpresenze
-        ]
+        for presenza in sqlpresenze:
+            presenza_dict = {"id": presenza.id,
+                             "giorno": presenza.giorno,
+                             "entrata": presenza.entrata,
+                             "uscita": presenza.uscita,
+                             "codice": presenza.codice,
+                             "valido": presenza.valido,
+                             }
+            presenza_list.append(presenza_dict)
 
-        # se non esiste il record della presenza lo crea con l'entrata
-
+        # Nel caso di NESSUNA presenza 'aperta' si procede con la creazione di essa al
+        # tempo corrente
+        # Ritorna il messaggio "Entrata registrata" con codice 201
         if not presenza_list:
-            insert = Presenze(codice=codice, giorno=giorno, entrata=time, valido=1)
-            # print("insert:\n" + insert)
+            insert = Presenze(codice=codice, giorno=giorno,
+                              entrata=time, valido=1)
             db.session.add(insert)
             db.session.commit()
             response = jsonify({"msg": "Entrata registrata", "code": 201})
-        else:  # altrimenti aggiorno l'uscita
+
+        # Altrimenti, se ESISTE una presenza 'aperta' si procede con la sua chiusura al tempo
+        # corrente
+        # Ritorna il messaggio "Uscita registrata" con codice 202
+        else:
             update = (
                 Presenze.query.filter_by(codice=codice)
                 .filter_by(giorno=giorno)
