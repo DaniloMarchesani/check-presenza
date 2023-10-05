@@ -1,2 +1,2 @@
-# check-presenza
-an app for check presence into the classroom
+# Check-Presenza-Studenti
+An app to check the students' attendance
